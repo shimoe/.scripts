@@ -27,16 +27,14 @@ git_action(){
                 echo -e '\e[36m fetch now...\e[m'
                 git fetch -p
             else
-                echo f
+                echo -e '\e[36m fetch now...\e[m'
                 git fetch -p
             fi
         elif [ "$1" = "p" ]; then
             if [ "$2" = "y" ]; then
-                echo py
                 git pull
             else
                 select_pull
-                echo p
             fi
         fi
         cd $ROOT_DIR
@@ -78,19 +76,17 @@ done
 #実行部
 if [ "$fflag" = "-f" ]; then
     if [ "$yflag" = "-y" ]; then
-        echo "fy"
         git_action f y
     else
-        echo "f"
         git_action f
     fi
 fi
 
 if [ "$pflag" = "-p" ]; then
     if [ "$yflag" = "-y" ]; then
-        echo "py"
+        git_action p y
     else
-        echo "p"
+        git_action p
     fi
 fi
 
