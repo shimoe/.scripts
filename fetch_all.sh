@@ -28,7 +28,7 @@ git_action(){
                 git fetch -p
             else
                 echo -e '\e[36m fetch now...\e[m'
-                git fetch -p
+                git fetch -p #ひとまずfetchは問答無用
             fi
         elif [ "$1" = "p" ]; then
             if [ "$2" = "y" ]; then
@@ -46,6 +46,10 @@ git_action(){
 declare -i argc=0
 declare -a argv=()
 
+
+if [ $# = 0 ] ; then
+    git_action f y
+fi
 while (( $# > 0 ))
 do
     case "$1" in
@@ -61,7 +65,7 @@ do
             fi
             if [[ "$1" =~ 'h' ]]; then
                 hflag='-h'
-                echo -e "Option help \n -p : pull mode \n -f : fetch mode"
+                echo -e "Option help \n -p : pull mode \n -f : fetch mode \n -h : show this help \n no option : fetch all"
             fi
             shift
             ;;
