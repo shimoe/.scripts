@@ -19,18 +19,18 @@ git_action(){
     dir_array=($dir_list)
     i=0;
     for e in ${dir_array[@]}; do
-        echo $e
+        echo -n "repository : " && echo -e "\e[32m$(echo $e | sed -e 's/\.\///g')\e[m"
         cd $e
-        echo -n "branch" && git branch --contains | sed -e 's/\*/:/'
+        echo -n "branch :" && echo -e "\e[33m$(git branch --contains | sed -e 's/\*//')\e[m"
         if [ "$1" = "f" ]; then
+            echo -e '\e[36m fetch now...\e[m'
             if [ "$2" = "y" ]; then
-                echo -e '\e[36m fetch now...\e[m'
                 git fetch -p
             else
-                echo -e '\e[36m fetch now...\e[m'
                 git fetch -p #ひとまずfetchは問答無用
             fi
         elif [ "$1" = "p" ]; then
+            echo -e '\e[31m pull now...\e[m'
             if [ "$2" = "y" ]; then
                 git pull
             else
