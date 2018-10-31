@@ -14,23 +14,23 @@ select_pull(){
 
 git_action(){
     ROOT_DIR=$(pwd)
-    echo "root_dir : $ROOT_DIR"
+    echo -e "\e[34mroot_dir : $ROOT_DIR\e[m\n"
     dir_list=$(echo $(dirname $(find -type d -name .git)))
     dir_array=($dir_list)
     i=0;
-    for e in ${dir_array[@]}; do
-        echo -n "repository : " && echo -e "\e[32m$(echo $e | sed -e 's/\.\///g')\e[m"
-        cd $e
+    for target_dir in ${dir_array[@]}; do
+        echo -n "repository : " && echo -e "\e[32m$(echo $target_dir | sed -e 's/\.\///g')\e[m"
+        cd $target_dir
         echo -n "branch :" && echo -e "\e[33m $(git symbolic-ref --short HEAD)\e[m"
         if [ "$1" = "f" ]; then
-            echo -e '\e[36m fetch now...\e[m'
+            echo -e '\e[36m fetch now...\e[m\n'
             if [ "$2" = "y" ]; then
                 git fetch -p
             else
                 git fetch -p #ひとまずfetchは問答無用
             fi
         elif [ "$1" = "p" ]; then
-            echo -e '\e[31m pull now...\e[m'
+            echo -e '\e[31m pull now...\e[m\n'
             if [ "$2" = "y" ]; then
                 git pull
             else
