@@ -1,5 +1,9 @@
 #!bin/bash
 
+_git_pull(){
+    git pull origin $(echo $(git branch --contains | sed -e 's/\*//'))
+}
+
 _select_mode(){
     read -p "fetch or pull? [f/p]" fp
     case "$fp" in
@@ -17,7 +21,7 @@ _select_pull(){
     read -p "pull ok? (y/N): " yn
     echo "yn = $yn"
     if [[ $yn =~ y|Y ]]; then
-        git pull
+        _git_pull
         return 1
     else
         return 0
@@ -44,7 +48,7 @@ _git_action(){
         elif [ "$1" = "p" ]; then
             echo -e '\e[31m pull now...\e[m'
             if [ "$2" = "y" ]; then
-                git pull
+                _git_pull
             else
                 _select_pull
             fi
@@ -89,10 +93,11 @@ do
     esac
 done
 
-#実行部
 if [ "$fflag" = "-f" -a "$pflag" = "-p" ]; then
     _select_mode
 fi
+
+#実行部
 if [ "$fflag" = "-f" ]; then
     if [ "$yflag" = "-y" ]; then
         _git_action f y
