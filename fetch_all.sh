@@ -1,6 +1,18 @@
 #!bin/bash
 
-select_pull(){
+_select_mode(){
+    read -p "fetch or pull? [f/p]" fp
+    case "$fp" in
+        f)  echo "fetch mode."
+            unset pflag ;;
+        p)  echo "pull mode."
+            unset fflag ;;
+        *)  echo "try again"
+            _select_mode ;;
+    esac
+}
+
+_select_pull(){
     local yn=''
     read -p "pull ok? (y/N): " yn
     echo "yn = $yn"
@@ -12,7 +24,7 @@ select_pull(){
     fi
 }
 
-git_action(){
+_git_action(){
     ROOT_DIR=$(pwd)
     echo "root_dir : $ROOT_DIR"
     dir_list=$(echo $(dirname $(find -type d -name .git)))
@@ -34,7 +46,7 @@ git_action(){
             if [ "$2" = "y" ]; then
                 git pull
             else
-                select_pull
+                _select_pull
             fi
         fi
         cd $ROOT_DIR
@@ -46,9 +58,9 @@ git_action(){
 declare -i argc=0
 declare -a argv=()
 
-
+#オプション解析
 if [ $# = 0 ] ; then
-    git_action f y
+    _git_action f y
 fi
 while (( $# > 0 ))
 do
@@ -78,21 +90,25 @@ do
 done
 
 #実行部
+if [ "$fflag" = "-f" -a "$pflag" = "-p" ]; then
+    _select_mode
+fi
 if [ "$fflag" = "-f" ]; then
     if [ "$yflag" = "-y" ]; then
-        git_action f y
+        _git_action f y
     else
-        git_action f
+        _git_action f
     fi
 fi
 
 if [ "$pflag" = "-p" ]; then
     if [ "$yflag" = "-y" ]; then
-        git_action p y
+        _git_action p y
     else
-        git_action p
+        _git_action p
     fi
 fi
+
 
 #変数掃除
 unset fflag pflag yflag hflag
