@@ -8,9 +8,9 @@ _select_mode(){
     read -p "fetch or pull? [f/p]" fp
     case "$fp" in
         f)  echo "fetch mode."
-            unset pflag ;;
+            $pflag = 0 ;;
         p)  echo "pull mode."
-            unset fflag ;;
+            $fflag = 0 ;;
         *)  echo "try again"
             _select_mode ;;
     esac
