@@ -21,7 +21,7 @@ git_action(){
     for e in ${dir_array[@]}; do
         echo -n "repository : " && echo -e "\e[32m$(echo $e | sed -e 's/\.\///g')\e[m"
         cd $e
-        echo -n "branch :" && echo -e "\e[33m$(git branch --contains | sed -e 's/\*//')\e[m"
+        echo -n "branch :" && echo -e "\e[33m $(git symbolic-ref --short HEAD)\e[m"
         if [ "$1" = "f" ]; then
             echo -e '\e[36m fetch now...\e[m'
             if [ "$2" = "y" ]; then
