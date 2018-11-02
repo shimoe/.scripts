@@ -1,7 +1,7 @@
 #!bin/bash
 
 _git_pull(){
-    git pull origin $(echo $(git branch --contains | sed -e 's/\*//'))
+    git pull origin $(echo $(git symbolic-ref --short HEAD))
 }
 
 _select_mode(){
@@ -31,7 +31,12 @@ _select_pull(){
 _git_action(){
     ROOT_DIR=$(pwd)
     echo -e "\e[34mroot_dir : $ROOT_DIR\e[m\n"
-    dir_list=$(echo $(dirname $(find -type d -name .git)))
+    git_dirs=$(find -type d -name .git)
+    if [ "$git_dirs" = "" ]; then
+        echo "No such Git directory. Exit scripts."
+        return 2> /dev/null
+    fi
+    dir_list=$(echo $(dirname $git_dirs))
     dir_array=($dir_list)
     i=0;
     for target_dir in ${dir_array[@]}; do
