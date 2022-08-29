@@ -5,12 +5,17 @@ _git_pull(){
 }
 
 _select_mode(){
-    read -p "fetch or pull? [f/p]" fp
+    read -p "select command [f/p/b]" fp
     case "$fp" in
         f)  echo "fetch mode."
-            $pflag = 0 ;;
+            $pflag = 0 
+            $bflag = 0 ;;
         p)  echo "pull mode."
-            $fflag = 0 ;;
+            $fflag = 0 
+            $bflag = 0 ;;
+        p)  echo "pull mode."
+            $fflag = 0 
+            $pflag = 0 ;;
         *)  echo "try again"
             _select_mode ;;
     esac
@@ -40,9 +45,9 @@ _git_action(){
     dir_array=($dir_list)
     i=0;
     for target_dir in ${dir_array[@]}; do
-        echo -n "repository : " && echo -e "\e[32m$(echo $target_dir | sed -e 's/\.\///g')\e[m"
+        echo -n "repository : " && echo -e "\e[33m$(echo $target_dir | sed -e 's/\.\///g')\e[m"
         cd $target_dir
-        echo -n "branch :" && echo -e "\e[33m $(git symbolic-ref --short HEAD)\e[m"
+        echo -n "branch :" && echo -e "\e[32m $(git symbolic-ref --short HEAD)\e[m"
         if [ "$1" = "f" ]; then
             echo -e '\e[36m fetch now...\e[m\n'
             if [ "$2" = "y" ]; then
@@ -57,6 +62,10 @@ _git_action(){
             else
                 _select_pull
             fi
+        elif [ "$1" = "b" ]; then
+            echo -e '\e[36m other branch...\e[m'
+            git branch -l
+            echo ""
         fi
         cd $ROOT_DIR
         let i++
@@ -81,12 +90,15 @@ do
             if [[ "$1" =~ 'p' ]]; then
                 pflag='-p'
             fi
+            if [[ "$1" =~ 'b' ]]; then
+                bflag='-b'
+            fi
             if [[ "$1" =~ 'y' ]]; then
                 yflag='-y'
             fi
             if [[ "$1" =~ 'h' ]]; then
                 hflag='-h'
-                echo -e "Option help \n -p : pull mode \n -f : fetch mode \n -h : show this help \n no option : fetch all"
+                echo -e "Option help \n -p : pull mode \n -f : fetch mode \n -b : show branch \n -h : show this help \n no option : fetch all"
             fi
             shift
             ;;
@@ -98,7 +110,7 @@ do
     esac
 done
 
-if [ "$fflag" = "-f" -a "$pflag" = "-p" ]; then
+if [ "$fflag" = "-f" -a "$pflag" = "-p" -a "$bflag" = "-b" ]; then
     _select_mode
 fi
 
@@ -119,6 +131,9 @@ if [ "$pflag" = "-p" ]; then
     fi
 fi
 
+if [ "$bflag" = "-b" ]; then
+    _git_action b
+fi
 
 #変数掃除
-unset fflag pflag yflag hflag
+unset fflag pflag yflag hflag bflag
