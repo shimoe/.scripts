@@ -5,7 +5,7 @@ _git_pull(){
 }
 
 _select_mode(){
-    read -p "select command [f/p/b]" fp
+    read -p "select command [f/p/b/s]" fp
     case "$fp" in
         f)  echo "fetch mode."
             $pflag = 0 
@@ -66,74 +66,93 @@ _git_action(){
             echo -e '\e[36m other branch...\e[m'
             git branch -l
             echo ""
+        elif [ "$1" = "s" ]; then
+            echo -e '\e[36m show status...\e[m'
+            git status
+            echo ""
+        elif [ "$1" = "c" ]; then
+            git checkout $checkout_branch
+            echo ""
+        elif [ "$1" = "m" ]; then
+            git merge -m "merge from $merge_branch" --no-ff $merge_branch
+            echo ""
         fi
         cd $ROOT_DIR
         let i++
     done
 }
 
-#option解析
+#option解析;
 declare -i argc=0
 declare -a argv=()
 
-#オプション解析
 if [ $# = 0 ] ; then
-    _git_action f y
+    echo "no option"
+    # _git_action f y
 fi
-while (( $# > 0 ))
+while getopts fpbsyhm:c: OPTION
 do
-    case "$1" in
-        -*)
-            if [[ "$1" =~ 'f' ]]; then
-                fflag='-f'
-            fi
-            if [[ "$1" =~ 'p' ]]; then
-                pflag='-p'
-            fi
-            if [[ "$1" =~ 'b' ]]; then
-                bflag='-b'
-            fi
-            if [[ "$1" =~ 'y' ]]; then
-                yflag='-y'
-            fi
-            if [[ "$1" =~ 'h' ]]; then
-                hflag='-h'
-                echo -e "Option help \n -p : pull mode \n -f : fetch mode \n -b : show branch \n -h : show this help \n no option : fetch all"
-            fi
-            shift
-            ;;
+    case "$OPTION" in
+        f)  fflag='true' ;;
+        p)  pflag='true' ;;
+        b)  bflag='true' ;;
+        s)  sflag='true' ;;
+        m)  mflag='true' ;
+            merge_branch="$OPTARG" ;;
+        c)  cflag='true' ;
+            checkout_branch="$OPTARG" ;;
+        y)  yflag='true' ;;
+        h)  hflag='true' ;
+            echo "Option help"
+            echo "  -p : pull mode"
+            echo "  -f : fetch mode"
+            echo "  -b : show branch"
+            echo "  -h : show this help"
+            echo "  no option : fetch all" ;;
         *)
-            ((++argc))
-            argv=("${argv[@]}" "$1")
-            shift
-            ;;
+            echo $OPTION ;;
     esac
 done
+shift $((OPTIND - 1))
 
-if [ "$fflag" = "-f" -a "$pflag" = "-p" -a "$bflag" = "-b" ]; then
-    _select_mode
-fi
+# if [ "$fflag" = "true" -a "$pflag" = "true" -a "$bflag" = "true" ]; then
+#     _select_mode
+# fi
 
 #実行部
-if [ "$fflag" = "-f" ]; then
-    if [ "$yflag" = "-y" ]; then
+if [ "$fflag" = "true" ]; then
+    if [ "$yflag" = "true" ]; then
         _git_action f y
     else
         _git_action f
     fi
 fi
 
-if [ "$pflag" = "-p" ]; then
-    if [ "$yflag" = "-y" ]; then
+if [ "$pflag" = "true" ]; then
+    if [ "$yflag" = "true" ]; then
         _git_action p y
     else
         _git_action p
     fi
 fi
 
-if [ "$bflag" = "-b" ]; then
+if [ "$bflag" = "true" ]; then
     _git_action b
 fi
 
+if [ "$sflag" = "true" ]; then
+    _git_action s
+fi
+
+if [ "$cflag" = "true" ]; then
+    echo "checkout mode"
+    _git_action c
+fi
+
+if [ "$mflag" = "true" ]; then
+    echo "merge mode"
+    _git_action m
+fi
+
 #変数掃除
-unset fflag pflag yflag hflag bflag
+unset fflag pflag yflag hflag bflag sflag cflag mflag OPTION OPTARG OPTIND
